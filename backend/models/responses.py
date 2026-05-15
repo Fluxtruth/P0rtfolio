@@ -69,6 +69,31 @@ class RebalanceResponse(BaseModel):
     dry_run: bool
 
 
+class EnrichedPosition(BaseModel):
+    symbol: str
+    qty: str
+    market_value: str
+    unrealized_pl: str
+    current_price: str
+    unrealized_plpc: str
+    current_weight: float
+    target_weight: float
+    drift: float          # current_weight - target_weight (signed)
+    needs_rebalance: bool
+
+
+class SnapshotResponse(BaseModel):
+    account: AccountInfo
+    positions: List[EnrichedPosition]
+    cash_weight: float
+    untracked: List[str]   # positions with no target weight set
+    missing: List[str]     # target tickers with zero current position
+    total_drift: float     # sum of abs(drift) across all target tickers
+    needs_rebalance: bool
+    drift_threshold: float
+    updated_at: str
+
+
 class BacktestMetrics(BaseModel):
     total_return: float
     cagr: float

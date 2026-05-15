@@ -47,6 +47,11 @@ class FrontierRequest(BaseModel):
     optimized_ret: Optional[float] = None
 
 
+class SnapshotRequest(BaseModel):
+    target_weights: Dict[str, float] = Field(default_factory=dict)
+    drift_threshold: float = Field(default=0.05, ge=0.005, le=0.5)
+
+
 class BacktestRequest(BaseModel):
     tickers: List[str] = Field(..., min_length=1, max_length=30)
     weights: Dict[str, float]

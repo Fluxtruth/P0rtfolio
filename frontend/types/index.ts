@@ -67,6 +67,31 @@ export interface RebalanceResult {
   dry_run: boolean;
 }
 
+export interface EnrichedPosition {
+  symbol: string;
+  qty: string;
+  market_value: string;
+  unrealized_pl: string;
+  current_price: string;
+  unrealized_plpc: string;
+  current_weight: number;
+  target_weight: number;
+  drift: number;
+  needs_rebalance: boolean;
+}
+
+export interface SnapshotResult {
+  account: AccountInfo;
+  positions: EnrichedPosition[];
+  cash_weight: number;
+  untracked: string[];
+  missing: string[];
+  total_drift: number;
+  needs_rebalance: boolean;
+  drift_threshold: number;
+  updated_at: string;
+}
+
 export interface BacktestMetrics {
   total_return: number;
   cagr: number;

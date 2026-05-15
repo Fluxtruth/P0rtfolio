@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -52,6 +53,13 @@ export default function OptimizerPage() {
     }
   };
 
+  // Persist latest optimized weights for the dashboard
+  useEffect(() => {
+    if (optimization.result) {
+      localStorage.setItem("portfolio_target_weights", JSON.stringify(optimization.result.weights));
+    }
+  }, [optimization.result]);
+
   const handleOptimize = (params: {
     method: OptimizationMethod;
     targetVolatility?: number;
@@ -60,12 +68,7 @@ export default function OptimizerPage() {
   }) => {
     setLastRfr(params.riskFreeRate);
     optimization.optimize({ tickers: selected, periodDays, ...params });
-    // Kick off frontier computation in parallel (shares the cached price data)
-    frontier.compute({
-      tickers: selected,
-      periodDays,
-      riskFreeRate: params.riskFreeRate,
-    });
+    frontier.compute({ tickers: selected, periodDays, riskFreeRate: params.riskFreeRate });
   };
 
   const portfolioValue = account.data
@@ -77,14 +80,21 @@ export default function OptimizerPage() {
       {/* Header */}
       <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
               <ChartBarIcon className="h-5 w-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-sm font-bold text-zinc-100">Portfolio Optimizer</h1>
-              <p className="text-xs text-zinc-500">Ray Dalio · Uncorrelated Returns · Alpaca Paper Trading</p>
-            </div>
+            <nav className="flex gap-1">
+              <span className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-100 bg-zinc-800">
+                Optimizer
+              </span>
+              <Link
+                href="/dashboard"
+                className="rounded-md px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+              >
+                Dashboard
+              </Link>
+            </nav>
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-green-900/30 px-2.5 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-800/50">

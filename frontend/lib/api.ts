@@ -46,6 +46,15 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  getSnapshot: (body: {
+    target_weights: Record<string, number>;
+    drift_threshold?: number;
+  }) =>
+    request<import("@/types").SnapshotResult>("/api/snapshot", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
   runBacktest: (body: {
     tickers: string[];
     weights: Record<string, number>;
