@@ -38,3 +38,11 @@ class FrontierRequest(BaseModel):
     # Optional: overlay the already-computed optimized portfolio
     optimized_vol: Optional[float] = None
     optimized_ret: Optional[float] = None
+
+
+class BacktestRequest(BaseModel):
+    tickers: List[str] = Field(..., min_length=1, max_length=30)
+    weights: Dict[str, float]
+    period_days: int = Field(default=504, ge=60, le=2520)
+    risk_free_rate: float = Field(default=0.05, ge=0.0, le=0.2)
+    benchmark: str = Field(default="SPY")

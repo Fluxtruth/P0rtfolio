@@ -69,6 +69,36 @@ class RebalanceResponse(BaseModel):
     dry_run: bool
 
 
+class BacktestMetrics(BaseModel):
+    total_return: float
+    cagr: float
+    annual_volatility: float
+    sharpe_ratio: float
+    sortino_ratio: float
+    max_drawdown: float
+    calmar_ratio: float
+    beta: float
+    alpha: float
+    win_rate: float
+    n_trading_days: int
+
+
+class EquityPoint(BaseModel):
+    date: str
+    value: float
+
+
+class BacktestResponse(BaseModel):
+    portfolio_equity: List[EquityPoint]
+    benchmark_equity: List[EquityPoint]
+    drawdown: List[EquityPoint]
+    portfolio_metrics: BacktestMetrics
+    benchmark_metrics: BacktestMetrics
+    benchmark_symbol: Optional[str]
+    tickers_used: List[str]
+    weights_used: Dict[str, float]
+
+
 class FrontierResponse(BaseModel):
     # Monte Carlo random portfolios
     random_vols: List[float]

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
-from routers import correlation, frontier, market_data, optimization, trading
+from routers import backtest, correlation, frontier, market_data, optimization, trading
 
 app = FastAPI(
     title="Portfolio Optimizer API",
@@ -22,6 +22,7 @@ app.include_router(market_data.router, prefix="/api")
 app.include_router(correlation.router, prefix="/api")
 app.include_router(optimization.router, prefix="/api")
 app.include_router(frontier.router, prefix="/api")
+app.include_router(backtest.router, prefix="/api")
 app.include_router(trading.router, prefix="/api")
 
 

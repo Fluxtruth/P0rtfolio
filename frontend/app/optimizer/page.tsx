@@ -7,6 +7,7 @@ import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { TickerSelector } from "@/components/TickerSelector";
 import { CorrelationHeatmap } from "@/components/CorrelationHeatmap";
 import { EfficientFrontier } from "@/components/EfficientFrontier";
+import { BacktestPanel } from "@/components/BacktestPanel";
 import { OptimizationForm } from "@/components/OptimizationForm";
 import { OptimizationResults } from "@/components/OptimizationResults";
 import { AccountPanel } from "@/components/AccountPanel";
@@ -14,10 +15,11 @@ import { RebalanceModal } from "@/components/RebalanceModal";
 import { useCorrelation } from "@/hooks/useCorrelation";
 import { useOptimization } from "@/hooks/useOptimization";
 import { useFrontier } from "@/hooks/useFrontier";
+import { useBacktest } from "@/hooks/useBacktest";
 import { useAccount } from "@/hooks/useAccount";
 import { api } from "@/lib/api";
 import type { TickerInfo, OptimizationMethod } from "@/types";
-import { ChartBarIcon, BeakerIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, BeakerIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const DEFAULT_TICKERS = ["AAPL", "MSFT", "NVDA", "AMZN", "TSLA", "JPM", "GLD", "TLT", "XOM", "JNJ"];
 
@@ -30,8 +32,10 @@ export default function OptimizerPage() {
   const correlation = useCorrelation();
   const optimization = useOptimization();
   const frontier = useFrontier();
+  const backtest = useBacktest();
   const account = useAccount();
   const [lastRfr, setLastRfr] = useState(0.05);
+  const [backtestDays, setBacktestDays] = useState(504);
 
   // Load ticker universe
   useEffect(() => {
@@ -188,8 +192,49 @@ export default function OptimizerPage() {
                   result={optimization.result}
                   portfolioValue={portfolioValue || undefined}
                 />
+                {/* Backtest controls */}
+                <div className="mt-5 border-t border-zinc-800 pt-4 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-zinc-400">Period</label>
+                    <select
+                      value={backtestDays}
+                      onChange={(e) => setBacktestDays(Number(e.target.value))}
+                      className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-100"
+                    >
+                      <option value={252}>1 year</option>
+                      <option value={504}>2 years</option>
+                      <option value={756}>3 years</option>
+                      <option value={1260}>5 years</option>
+                    </select>
+                  </div>
+                  <Button
+                    onClick={() =>
+                      backtest.run({
+                        tickers: selected,
+                        weights: optimization.result!.weights,
+                        periodDays: backtestDays,
+                        riskFreeRate: lastRfr,
+                        benchmark: "SPY",
+                      })
+                    }
+                    disabled={backtest.loading}
+                    variant="secondary"
+                    className="flex items-center gap-1.5"
+                  >
+                    {backtest.loading ? (
+                      <><Spinner className="h-4 w-4" /> Running backtest…</>
+                    ) : (
+                      <><ArrowPathIcon className="h-4 w-4" /> Run Backtest vs SPY</>
+                    )}
+                  </Button>
+                </div>
+                {backtest.error && (
+                  <div className="mt-3">
+                    <ErrorAlert message={backtest.error} />
+                  </div>
+                )}
                 {account.data && portfolioValue > 0 && (
-                  <div className="mt-5 border-t border-zinc-800 pt-5">
+                  <div className="mt-4 border-t border-zinc-800 pt-4">
                     <p className="mb-3 text-xs text-zinc-500">
                       Account value: <span className="text-zinc-300 font-semibold">${portfolioValue.toLocaleString()}</span>
                     </p>
@@ -234,6 +279,21 @@ export default function OptimizerPage() {
                   optimizationResult={optimization.result}
                 />
               </>
+            )}
+          </Card>
+        )}
+
+        {/* Backtest results */}
+        {(backtest.result || backtest.loading) && (
+          <Card title="Backtest · Historical Performance vs SPY">
+            {backtest.loading && (
+              <div className="flex items-center justify-center gap-3 py-12 text-zinc-400">
+                <Spinner />
+                <span className="text-sm">Fetching price history & computing metrics…</span>
+              </div>
+            )}
+            {backtest.result && !backtest.loading && (
+              <BacktestPanel result={backtest.result} />
             )}
           </Card>
         )}

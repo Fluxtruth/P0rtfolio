@@ -67,6 +67,36 @@ export interface RebalanceResult {
   dry_run: boolean;
 }
 
+export interface BacktestMetrics {
+  total_return: number;
+  cagr: number;
+  annual_volatility: number;
+  sharpe_ratio: number;
+  sortino_ratio: number;
+  max_drawdown: number;
+  calmar_ratio: number;
+  beta: number;
+  alpha: number;
+  win_rate: number;
+  n_trading_days: number;
+}
+
+export interface EquityPoint {
+  date: string;
+  value: number;
+}
+
+export interface BacktestResult {
+  portfolio_equity: EquityPoint[];
+  benchmark_equity: EquityPoint[];
+  drawdown: EquityPoint[];
+  portfolio_metrics: BacktestMetrics;
+  benchmark_metrics: BacktestMetrics;
+  benchmark_symbol: string | null;
+  tickers_used: string[];
+  weights_used: Record<string, number>;
+}
+
 export interface FrontierData {
   random_vols: number[];
   random_rets: number[];

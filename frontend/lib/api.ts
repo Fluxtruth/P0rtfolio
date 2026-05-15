@@ -46,6 +46,18 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  runBacktest: (body: {
+    tickers: string[];
+    weights: Record<string, number>;
+    period_days: number;
+    risk_free_rate: number;
+    benchmark?: string;
+  }) =>
+    request<import("@/types").BacktestResult>("/api/backtest", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
   getFrontier: (body: {
     tickers: string[];
     period_days: number;
