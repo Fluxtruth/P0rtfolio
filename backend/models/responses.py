@@ -97,6 +97,7 @@ class BacktestResponse(BaseModel):
     benchmark_symbol: Optional[str]
     tickers_used: List[str]
     weights_used: Dict[str, float]
+    engine_used: str
 
 
 class FrontierResponse(BaseModel):

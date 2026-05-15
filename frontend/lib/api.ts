@@ -52,6 +52,7 @@ export const api = {
     period_days: number;
     risk_free_rate: number;
     benchmark?: string;
+    engine?: import("@/types").BacktestEngine;
   }) =>
     request<import("@/types").BacktestResult>("/api/backtest", {
       method: "POST",

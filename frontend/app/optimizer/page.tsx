@@ -36,6 +36,7 @@ export default function OptimizerPage() {
   const account = useAccount();
   const [lastRfr, setLastRfr] = useState(0.05);
   const [backtestDays, setBacktestDays] = useState(504);
+  const [backtestEngine, setBacktestEngine] = useState<import("@/types").BacktestEngine>("pandas");
 
   // Load ticker universe
   useEffect(() => {
@@ -193,19 +194,34 @@ export default function OptimizerPage() {
                   portfolioValue={portfolioValue || undefined}
                 />
                 {/* Backtest controls */}
-                <div className="mt-5 border-t border-zinc-800 pt-4 flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-zinc-400">Period</label>
-                    <select
-                      value={backtestDays}
-                      onChange={(e) => setBacktestDays(Number(e.target.value))}
-                      className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-100"
-                    >
-                      <option value={252}>1 year</option>
-                      <option value={504}>2 years</option>
-                      <option value={756}>3 years</option>
-                      <option value={1260}>5 years</option>
-                    </select>
+                <div className="mt-5 border-t border-zinc-800 pt-4 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-zinc-400">Period</label>
+                      <select
+                        value={backtestDays}
+                        onChange={(e) => setBacktestDays(Number(e.target.value))}
+                        className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-100"
+                      >
+                        <option value={252}>1 year</option>
+                        <option value={504}>2 years</option>
+                        <option value={756}>3 years</option>
+                        <option value={1260}>5 years</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-zinc-400">Engine</label>
+                      <select
+                        value={backtestEngine}
+                        onChange={(e) => setBacktestEngine(e.target.value as import("@/types").BacktestEngine)}
+                        className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-100"
+                      >
+                        <option value="pandas">pandas</option>
+                        <option value="backtesting_py">backtesting.py</option>
+                        <option value="zipline">Zipline (Quantopian)</option>
+                        <option value="lean">LEAN (requires Docker)</option>
+                      </select>
+                    </div>
                   </div>
                   <Button
                     onClick={() =>
@@ -215,6 +231,7 @@ export default function OptimizerPage() {
                         periodDays: backtestDays,
                         riskFreeRate: lastRfr,
                         benchmark: "SPY",
+                        engine: backtestEngine,
                       })
                     }
                     disabled={backtest.loading}

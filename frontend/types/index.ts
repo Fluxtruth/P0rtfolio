@@ -86,6 +86,8 @@ export interface EquityPoint {
   value: number;
 }
 
+export type BacktestEngine = "pandas" | "backtesting_py" | "zipline" | "lean";
+
 export interface BacktestResult {
   portfolio_equity: EquityPoint[];
   benchmark_equity: EquityPoint[];
@@ -95,6 +97,7 @@ export interface BacktestResult {
   benchmark_symbol: string | null;
   tickers_used: string[];
   weights_used: Record<string, number>;
+  engine_used: string;
 }
 
 export interface FrontierData {

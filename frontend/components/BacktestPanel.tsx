@@ -65,8 +65,16 @@ function MetricsTable({ port, bench, benchSymbol }: { port: BacktestMetrics; ben
   );
 }
 
+const ENGINE_LABELS: Record<string, { label: string; color: string; note?: string }> = {
+  pandas: { label: "pandas / numpy", color: "bg-blue-900/40 text-blue-300 ring-blue-800/50" },
+  backtesting_py: { label: "backtesting.py", color: "bg-violet-900/40 text-violet-300 ring-violet-800/50" },
+  zipline: { label: "Zipline (Quantopian)", color: "bg-amber-900/40 text-amber-300 ring-amber-800/50" },
+  lean: { label: "LEAN (QuantConnect)", color: "bg-emerald-900/40 text-emerald-300 ring-emerald-800/50", note: "Requires Docker daemon" },
+};
+
 export function BacktestPanel({ result }: Props) {
-  const { portfolio_equity, benchmark_equity, drawdown, portfolio_metrics, benchmark_metrics, benchmark_symbol } = result;
+  const { portfolio_equity, benchmark_equity, drawdown, portfolio_metrics, benchmark_metrics, benchmark_symbol, engine_used } = result;
+  const engineMeta = ENGINE_LABELS[engine_used] ?? { label: engine_used, color: "bg-zinc-800 text-zinc-300 ring-zinc-700" };
   const bench = benchmark_symbol ?? "SPY";
 
   const dates = portfolio_equity.map((p) => p.date);
@@ -120,6 +128,16 @@ export function BacktestPanel({ result }: Props) {
 
   return (
     <div className="space-y-6">
+      {/* Engine badge */}
+      <div className="flex items-center gap-2">
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${engineMeta.color}`}>
+          {engineMeta.label}
+        </span>
+        {engineMeta.note && (
+          <span className="text-xs text-zinc-500">{engineMeta.note}</span>
+        )}
+      </div>
+
       {/* Equity curve */}
       <div>
         <p className="mb-1 text-xs text-zinc-500">Equity curve · normalised to $100</p>

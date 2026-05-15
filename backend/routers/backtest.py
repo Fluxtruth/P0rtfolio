@@ -16,6 +16,7 @@ def backtest(req: BacktestRequest):
             period_days=req.period_days,
             risk_free_rate=req.risk_free_rate,
             benchmark=req.benchmark,
+            engine=req.engine,
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))

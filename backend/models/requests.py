@@ -3,6 +3,13 @@ from typing import Dict, List, Optional
 from enum import Enum
 
 
+class BacktestEngine(str, Enum):
+    pandas = "pandas"
+    backtesting_py = "backtesting_py"
+    zipline = "zipline"
+    lean = "lean"
+
+
 class OptimizationMethod(str, Enum):
     max_sharpe = "max_sharpe"
     min_volatility = "min_volatility"
@@ -46,3 +53,4 @@ class BacktestRequest(BaseModel):
     period_days: int = Field(default=504, ge=60, le=2520)
     risk_free_rate: float = Field(default=0.05, ge=0.0, le=0.2)
     benchmark: str = Field(default="SPY")
+    engine: BacktestEngine = BacktestEngine.pandas

@@ -14,6 +14,7 @@ export function useBacktest() {
     periodDays: number;
     riskFreeRate: number;
     benchmark?: string;
+    engine?: import("@/types").BacktestEngine;
   }) {
     setLoading(true);
     setError(null);
@@ -24,6 +25,7 @@ export function useBacktest() {
         period_days: params.periodDays,
         risk_free_rate: params.riskFreeRate,
         benchmark: params.benchmark ?? "SPY",
+        engine: params.engine ?? "pandas",
       });
       setResult(data);
     } catch (e) {
