@@ -66,3 +66,19 @@ export interface RebalanceResult {
   total_trades: number;
   dry_run: boolean;
 }
+
+export interface FrontierData {
+  random_vols: number[];
+  random_rets: number[];
+  random_sharpes: number[];
+  frontier_vols: number[];
+  frontier_rets: number[];
+  max_sharpe_vol: number;
+  max_sharpe_ret: number;
+  max_sharpe_ratio: number;
+  min_vol: number;
+  min_ret: number;
+  cml_vols: number[];
+  cml_rets: number[];
+  risk_free_rate: number;
+}

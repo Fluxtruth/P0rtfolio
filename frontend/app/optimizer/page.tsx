@@ -6,12 +6,14 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { TickerSelector } from "@/components/TickerSelector";
 import { CorrelationHeatmap } from "@/components/CorrelationHeatmap";
+import { EfficientFrontier } from "@/components/EfficientFrontier";
 import { OptimizationForm } from "@/components/OptimizationForm";
 import { OptimizationResults } from "@/components/OptimizationResults";
 import { AccountPanel } from "@/components/AccountPanel";
 import { RebalanceModal } from "@/components/RebalanceModal";
 import { useCorrelation } from "@/hooks/useCorrelation";
 import { useOptimization } from "@/hooks/useOptimization";
+import { useFrontier } from "@/hooks/useFrontier";
 import { useAccount } from "@/hooks/useAccount";
 import { api } from "@/lib/api";
 import type { TickerInfo, OptimizationMethod } from "@/types";
@@ -27,7 +29,9 @@ export default function OptimizerPage() {
 
   const correlation = useCorrelation();
   const optimization = useOptimization();
+  const frontier = useFrontier();
   const account = useAccount();
+  const [lastRfr, setLastRfr] = useState(0.05);
 
   // Load ticker universe
   useEffect(() => {
@@ -49,10 +53,13 @@ export default function OptimizerPage() {
     targetReturn?: number;
     riskFreeRate: number;
   }) => {
-    optimization.optimize({
+    setLastRfr(params.riskFreeRate);
+    optimization.optimize({ tickers: selected, periodDays, ...params });
+    // Kick off frontier computation in parallel (shares the cached price data)
+    frontier.compute({
       tickers: selected,
       periodDays,
-      ...params,
+      riskFreeRate: params.riskFreeRate,
     });
   };
 
@@ -205,6 +212,31 @@ export default function OptimizerPage() {
             )}
           </div>
         </div>
+
+        {/* Efficient Frontier */}
+        {(frontier.data || frontier.loading || frontier.error) && (
+          <Card title="Efficient Frontier · Monte Carlo Simulation">
+            {frontier.error && <ErrorAlert message={frontier.error} />}
+            {frontier.loading && (
+              <div className="flex items-center justify-center gap-3 py-12 text-zinc-400">
+                <Spinner />
+                <span className="text-sm">Sampling 3,000 portfolios…</span>
+              </div>
+            )}
+            {frontier.data && !frontier.loading && (
+              <>
+                <p className="mb-3 text-xs text-zinc-500">
+                  Each dot is a random portfolio · Colour = Sharpe ratio · Blue line = efficient frontier ·
+                  Dashed = Capital Market Line · ★ = your optimised portfolio
+                </p>
+                <EfficientFrontier
+                  data={frontier.data}
+                  optimizationResult={optimization.result}
+                />
+              </>
+            )}
+          </Card>
+        )}
 
         {/* Footer note */}
         <p className="text-center text-xs text-zinc-700 pb-4">

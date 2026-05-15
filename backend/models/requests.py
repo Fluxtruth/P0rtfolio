@@ -28,3 +28,13 @@ class RebalanceRequest(BaseModel):
     weights: Dict[str, float]
     account_value: float = Field(..., gt=0)
     dry_run: bool = True
+
+
+class FrontierRequest(BaseModel):
+    tickers: List[str] = Field(..., min_length=2, max_length=30)
+    period_days: int = Field(default=252, ge=60, le=1260)
+    risk_free_rate: float = Field(default=0.05, ge=0.0, le=0.2)
+    n_samples: int = Field(default=3000, ge=500, le=8000)
+    # Optional: overlay the already-computed optimized portfolio
+    optimized_vol: Optional[float] = None
+    optimized_ret: Optional[float] = None

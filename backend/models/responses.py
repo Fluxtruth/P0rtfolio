@@ -67,3 +67,23 @@ class RebalanceResponse(BaseModel):
     orders_skipped: List[str]
     total_trades: int
     dry_run: bool
+
+
+class FrontierResponse(BaseModel):
+    # Monte Carlo random portfolios
+    random_vols: List[float]
+    random_rets: List[float]
+    random_sharpes: List[float]
+    # Efficient frontier curve points (sorted by vol)
+    frontier_vols: List[float]
+    frontier_rets: List[float]
+    # Key portfolios
+    max_sharpe_vol: float
+    max_sharpe_ret: float
+    max_sharpe_ratio: float
+    min_vol: float
+    min_ret: float
+    # CML endpoints: (0, rf_rate) -> (max_sharpe_vol * 1.5, cml_ret_at_extend)
+    cml_vols: List[float]
+    cml_rets: List[float]
+    risk_free_rate: float

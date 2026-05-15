@@ -45,4 +45,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+
+  getFrontier: (body: {
+    tickers: string[];
+    period_days: number;
+    risk_free_rate: number;
+    n_samples?: number;
+    optimized_vol?: number;
+    optimized_ret?: number;
+  }) =>
+    request<import("@/types").FrontierData>("/api/frontier", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 };
